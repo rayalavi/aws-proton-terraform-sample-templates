@@ -11,10 +11,10 @@ resource "aws_cloudwatch_event_target" "ecs-cluster-event-target" {
     task_definition_arn = aws_ecs_task_definition.scheduled-task-definition.arn
   }
   input = "{}"
-  role_arn = aws_iam_role.scheduled-task-def-role.arn
+  role_arn = aws_iam_role.scheduled-task-def-events-role.arn
 }
 
-resource "aws_iam_role" "scheduled-task-def-role" {
+resource "aws_iam_role" "scheduled-task-def-task-role" {
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -23,14 +23,14 @@ resource "aws_iam_role" "scheduled-task-def-role" {
         Effect = "Allow"
         Sid    = ""
         Principal = {
-          Service = "ecs-task.amazonaws.com"
+          Service = "ecs-tasks.amazonaws.com"
         }
-      }
+      },
     ]
   })
 }
 
-resource "aws_iam_role_policy" "scheduled-task-def-role-policy" {
+resource "aws_iam_role_policy" "scheduled-task-def-task-role-policy" {
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -41,7 +41,7 @@ resource "aws_iam_role_policy" "scheduled-task-def-role-policy" {
       }
     ]
   })
-  role   = aws_iam_role.scheduled-task-def-role.id
+  role   = aws_iam_role.scheduled-task-def-task-role.id
 }
 
 resource "aws_iam_role" "scheduled-task-def-events-role" {
@@ -73,17 +73,17 @@ resource "aws_iam_role_policy" "scheduled-task-def-events-role-policy" {
       {
         Action = "iam:PassRole"
         Effect = "Allow",
-        Resource = var.environment.outputs.ServiceTaskDefExecutionRoleArn
+        Resource = var.environment.outputs.ServiceTaskDefExecutionRole
       },
       {
         Action = "iam:PassRole"
         Effect = "Allow",
-        Resource = aws_iam_role.scheduled-task-def-role.arn
+        Resource = aws_iam_role.scheduled-task-def-task-role.arn
       }
     ]
   })
   name = "ScheduledECSEC2TaskScheduledTaskDefEventsRoleDefaultPolicy"
-  role   = aws_iam_role.scheduled-task-def-role.id
+  role   = aws_iam_role.scheduled-task-def-events-role.id
 }
 
 resource "aws_cloudwatch_log_group" "scheduled-task-log-group" {
@@ -92,32 +92,33 @@ resource "aws_cloudwatch_log_group" "scheduled-task-log-group" {
 
 resource "aws_ecs_task_definition" "scheduled-task-definition" {
   family                   = "${var.service.name}_${var.service_instance.name}"
-  container_definitions    = jsonencode({
-    Essential : true,
-    Image : var.service_instance.inputs.image,
-    LogConfiguration : {
-      LogDriver : "awslogs",
-      Options : {
-        awslogs-group : aws_cloudwatch_log_group.scheduled-task-log-group.arn
-        awslogs-stream-prefix : "${var.service.name}/${var.service_instance.name}"
+  container_definitions    = jsonencode([{
+    name : "${ var.service_instance.name }-bar",
+    image : var.service_instance.inputs.image,
+    cpu : lookup(var.task-size, var.service_instance.inputs.task_size).cpu
+    memory : lookup(var.task-size, var.service_instance.inputs.task_size).memory
+    essential : true,
+    logConfiguration : {
+      logDriver : "awslogs",
+      options : {
+        awslogs-group : aws_cloudwatch_log_group.scheduled-task-log-group.name,
+        awslogs-stream-prefix : "${var.service.name}/${var.service_instance.name}",
         awslogs-region : local.region
       }
     },
-    Name : var.service_instance.name,
-    Environment : [
+    environment : [
       {
-        Name : "SNS_TOPIC_ARN",
-        Value : { ping : var.environment.outputs.SNSTopic }
-      }, {
-        Name : "SNS_REGION",
-        Value : var.environment.outputs.SNSRegion
+        name : "SNS_TOPIC_ARN",
+        value : "{ \"ping\" : \"${var.environment.outputs.SNSTopic}\" }"
+      },
+      {
+        name : "SNS_REGION",
+        value : var.environment.outputs.SNSRegion
       }
-    ],
-    Cpu : lookup(var.task-size, var.service_instance.inputs.task_size).cpu
-    Memory : lookup(var.task-size, var.service_instance.inputs.task_size).memory
-  })
-  execution_role_arn       = var.environment.outputs.ServiceTaskDefExecutionRoleArn
+    ]
+  }])
+  task_role_arn            = aws_iam_role.scheduled-task-def-task-role.arn
+  execution_role_arn       = var.environment.outputs.ServiceTaskDefExecutionRole
   network_mode             = "bridge"
   requires_compatibilities = ["EC2"]
-  task_role_arn            = aws_iam_role.scheduled-task-def-role.arn
 }
