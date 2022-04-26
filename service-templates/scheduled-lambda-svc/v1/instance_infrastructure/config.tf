@@ -7,9 +7,9 @@ terraform {
   }
 
   backend "s3" {
-    bucket = "racicot-arrow-testing"
-    region = "us-east-1"
-    key    = "ecs-ec2-env.state"
+    bucket = "racicot-proton-test-nrt"
+    region = "ap-northeast-1"
+    key    = "scheduled-lambda-svc-my-instance.state"
   }
 }
 
@@ -25,5 +25,5 @@ provider "aws" {
 
 variable "aws_region" {
   type    = string
-  default = "us-east-1"
+  default = "ap-northeast-1"
 }
