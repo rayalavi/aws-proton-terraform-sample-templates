@@ -82,7 +82,7 @@ resource "aws_codebuild_project" "build_project" {
                     "post_build": {
                       "commands": [
                         "aws proton --region ${local.region} get-service --name $service_name | jq -r .service.spec > service.yaml",
-                        "yq 'instances[*].spec.lambda_bucket' \"$bucket_name\" service.yaml > rendered_service.yaml",
+                        "yq w service.yaml 'instances[*].spec.lambda_bucket' \"$bucket_name\" > rendered_service.yaml",
                         "yq w rendered_service.yaml 'instances[*].spec.lambda_key' \"$FUNCTION_KEY\" > rendered_service.yaml",
                         "echo 'rendered_service.yaml':",
                         "cat rendered_service.yaml"
