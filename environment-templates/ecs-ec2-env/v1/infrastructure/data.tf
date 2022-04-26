@@ -154,7 +154,7 @@ resource "aws_iam_policy" "ecs_drain_hook_function_service_role_default_policy" 
       }
     ]
   })
-  name = "ecs_drain_hook_function_service_role_default_policy"
+  name_prefix = "ecs_drain_hook_service_role_default"
 }
 
 resource "aws_iam_role" "service-task-def-execution-role" {
@@ -175,7 +175,7 @@ resource "aws_iam_role" "service-task-def-execution-role" {
   ]
 }
 
-resource "aws_iam_role_policy_attachment" "ecs_drain_hook_function_service_role_default_policy" {
+resource "aws_iam_role_policy_attachment" "ecs_drain_hook_function_service_role_default_policy_attachment" {
   role       = aws_iam_role.ecs_drain_hook_function_service_role.name
   policy_arn = aws_iam_policy.ecs_drain_hook_function_service_role_default_policy.arn
 }
