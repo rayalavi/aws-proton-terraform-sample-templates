@@ -18,24 +18,24 @@ resource "aws_lambda_function" "function" {
   timeout     = var.service_instance.inputs.lambda_timeout
 
   # Specificy either the custom lambda code location in s3, or path to the default code otherwise.
-  s3_bucket = try(var.service_instance.inputs.code_bucket, null)
-  s3_key    = try(var.service_instance.inputs.code_object_key, null)
-  filename  = try(var.service_instance.inputs.code_bucket, false) ? null : data.archive_file.inline_lambda_code.output_path
+  s3_bucket = local.using_default_lambda_code ? null : var.service_instance.inputs.code_bucket
+  s3_key    = local.using_default_lambda_code ? null : var.service_instance.inputs.code_object_key
+  filename  = local.using_default_lambda_code ? data.archive_file.inline_lambda_code.output_path : null
 
   environment {
     variables = {
-      SNSTopic = var.environment.outputs.sns_topic_name
+      SNSTopic = var.environment.outputs.SnsTopicName
     }
   }
 
   vpc_config {
-    security_group_ids = [var.environment.outputs.vpc_default_security_group]
+    security_group_ids = [var.environment.outputs.VpcDefaultSecurityGroupId]
     subnet_ids = var.service_instance.inputs.subnet_type == "private" ? [
-      var.environment.outputs.private_subnet_one_id,
-      var.environment.outputs.private_subnet_two_id
+      var.environment.outputs.PrivateSubnetOneId,
+      var.environment.outputs.PrivateSubnetTwoId
       ] : [
-      var.environment.outputs.public_subnet_one_id,
-      var.environment.outputs.public_subnet_two_id
+      var.environment.outputs.PublicSubnetOneId,
+      var.environment.outputs.PublicSubnetTwoId
     ]
   }
 }
@@ -69,7 +69,7 @@ EOF
           "Action" : [
             "sns:Publish"
           ],
-          "Resource" : "arn:${local.partition}:sns:${var.environment.outputs.sns_region}:${local.account_id}:${var.environment.outputs.sns_topic_name}"
+          "Resource" : "arn:${local.partition}:sns:${var.environment.outputs.SnsRegion}:${local.account_id}:${var.environment.outputs.SnsTopicName}"
         }
       ]
     })
