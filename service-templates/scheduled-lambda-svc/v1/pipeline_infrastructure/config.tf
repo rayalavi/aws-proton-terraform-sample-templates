@@ -9,7 +9,7 @@ terraform {
   backend "s3" {
     bucket = "racicot-arrow-testing"
     region = "us-east-1"
-    key = "scheduled-lambda-svc-pipeline.state"
+    key    = "scheduled-lambda-svc-pipeline.state"
   }
 }
 
