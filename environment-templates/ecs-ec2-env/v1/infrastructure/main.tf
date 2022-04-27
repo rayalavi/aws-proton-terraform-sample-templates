@@ -115,6 +115,12 @@ resource "aws_sns_topic" "ecs_drain_hook_topic" {
   name_prefix = "ecs_drain_hook-"
 }
 
+resource "aws_sns_topic_subscription" "ecs_drain_hook_topic_subscription" {
+  endpoint  = aws_lambda_function.ecs_drain_function.arn
+  protocol  = "lambda"
+  topic_arn = aws_sns_topic.ecs_drain_hook_topic
+}
+
 resource "aws_lambda_function" "ecs_drain_function" {
   function_name = "${var.environment.name}_drain_hook_function"
   role          = aws_iam_role.ecs_drain_hook_function_service_role.arn
