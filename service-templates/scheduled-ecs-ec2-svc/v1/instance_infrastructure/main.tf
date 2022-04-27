@@ -115,8 +115,8 @@ resource "aws_ecs_task_definition" "scheduled-task-definition" {
         value : var.environment.outputs.SnsRegion
       }
     ],
-    cpu : lookup(var.task-size, var.service_instance.inputs.task_size).cpu,
-    memory : lookup(var.task-size, var.service_instance.inputs.task_size).memory
+    cpu : lookup(var.task_sizes[var.service_instance.inputs.task_size], "cpu")
+    memory : lookup(var.task_sizes[var.service_instance.inputs.task_size], "memory")
   }])
   execution_role_arn       = var.environment.outputs.ServiceTaskDefExecutionRole
   family                   = "${var.service.name}_${var.service_instance.name}"
