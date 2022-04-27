@@ -117,8 +117,8 @@ resource "aws_iam_policy" "ecs_host_instance_role_default_policy" {
         Effect   = "Allow"
         Resource = "*"
         Condition : {
-          "ArnEquals": {
-            "ecs:Cluster": aws_ecs_cluster.cluster.arn
+          "ArnEquals" : {
+            "ecs:Cluster" : aws_ecs_cluster.cluster.arn
           }
         }
       },
@@ -234,7 +234,7 @@ resource "aws_iam_role_policy_attachment" "ecs_drain_hook_policy_attachment" {
 
 resource "aws_iam_role_policy_attachment" "ecs_instance_role_policy_attachment" {
   policy_arn = aws_iam_policy.ecs_host_instance_role_default_policy
-  role = aws_iam_role.ecs_host_instance_role.name
+  role       = aws_iam_role.ecs_host_instance_role.name
 }
 
 data "aws_ssm_parameter" "ami_id" {
