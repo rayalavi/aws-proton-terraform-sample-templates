@@ -9,14 +9,18 @@ variable "environment" {
 
 variable "service" {
   type = object({
-    name = string
+    name                      = string
+    branch_name               = string
+    repository_connection_arn = string
+    repository_id             = string
   })
 }
 
 variable "service_instance" {
   type = object({
-    name   = string
-    inputs = map(string)
+    name       = string
+    inputs     = map(string)
+    components = map(string)
   })
   default = null
-}
+} 
