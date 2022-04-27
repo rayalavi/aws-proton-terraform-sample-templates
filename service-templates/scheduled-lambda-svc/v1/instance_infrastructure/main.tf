@@ -12,7 +12,7 @@ resource "aws_lambda_function" "function" {
   function_name = "${var.service_instance.name}-function"
   role          = aws_iam_role.iam_for_lambda.arn
 
-  handler     = local.using_default_lambda_code ? var.service_instance.inputs.lambda_handler : "index.handler"
+  handler     = local.using_default_lambda_code ? "index.handler" : var.service_instance.inputs.lambda_handler
   runtime     = var.service_instance.inputs.lambda_runtime
   memory_size = var.service_instance.inputs.lambda_memory
   timeout     = var.service_instance.inputs.lambda_timeout
@@ -24,7 +24,7 @@ resource "aws_lambda_function" "function" {
 
   environment {
     variables = {
-      SNSTopic = var.environment.outputs.SnsTopicName
+      SNStopic = var.environment.outputs.SnsTopicName
     }
   }
 
