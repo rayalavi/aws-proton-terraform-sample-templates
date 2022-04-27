@@ -95,10 +95,10 @@ resource "aws_codebuild_project" "build_project" {
                 }
 EOF
 
-    type = "CODEPIPELINE"
-  }
+type = "CODEPIPELINE"
+}
 
-  encryption_key = aws_kms_key.pipeline_artifacts_bucket_key.arn
+encryption_key = aws_kms_key.pipeline_artifacts_bucket_key.arn
 }
 
 
