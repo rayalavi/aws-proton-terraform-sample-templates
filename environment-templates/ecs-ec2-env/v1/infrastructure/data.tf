@@ -233,7 +233,7 @@ resource "aws_iam_role_policy_attachment" "ecs_drain_hook_policy_attachment" {
 }
 
 resource "aws_iam_role_policy_attachment" "ecs_instance_role_policy_attachment" {
-  policy_arn = aws_iam_policy.ecs_host_instance_role_default_policy
+  policy_arn = aws_iam_policy.ecs_host_instance_role_default_policy.arn
   role       = aws_iam_role.ecs_host_instance_role.name
 }
 
