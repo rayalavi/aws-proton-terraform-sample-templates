@@ -20,10 +20,6 @@ module "vpc" {
   }
 }
 
-resource "aws_internet_gateway" "vpc_gateway" {
-  vpc_id = module.vpc.vpc_id
-}
-
 resource "aws_vpc_endpoint" "ec2" {
   service_name        = "com.amazonaws.${local.region}.sns"
   vpc_id              = module.vpc.vpc_id
