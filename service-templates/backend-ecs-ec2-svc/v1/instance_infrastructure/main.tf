@@ -105,12 +105,13 @@ resource "aws_service_discovery_service" "service_cloudmap_service" {
 }
 
 resource "aws_security_group_rule" "ecs_host_security_group_from_other_host_containers" {
-  type              = "ingress"
-  protocol          = -1
-  from_port         = 0
-  to_port           = 65535
-  security_group_id = split("/", var.environment.outputs.ECSHostSecurityGroup)[1]
-  description       = "Ingress from other containers in the same security group"
+  type                     = "ingress"
+  protocol                 = -1
+  from_port                = 0
+  to_port                  = 65535
+  security_group_id        = split("/", var.environment.outputs.ECSHostSecurityGroup)[1]
+  source_security_group_id = split("/", var.environment.outputs.ECSHostSecurityGroup)[1]
+  description              = "Ingress from other containers in the same security group"
 }
 
 resource "aws_appautoscaling_target" "service_task_count_target" {
