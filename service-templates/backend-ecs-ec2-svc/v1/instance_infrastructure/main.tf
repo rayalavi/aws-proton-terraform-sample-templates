@@ -58,7 +58,7 @@ resource "aws_ecs_task_definition" "scheduled-task-definition" {
     ],
     portMappings = [
       {
-        containerPort = var.service_instance.inputs.port,
+        containerPort = tonumber(var.service_instance.inputs.port),
         hostPort      = 0
       }
     ]
