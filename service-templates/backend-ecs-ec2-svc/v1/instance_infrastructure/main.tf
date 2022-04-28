@@ -109,7 +109,7 @@ resource "aws_security_group_rule" "ecs_host_security_group_from_other_host_cont
   protocol          = -1
   from_port         = 0
   to_port           = 65535
-  security_group_id = var.environment.outputs.ECSHostSecurityGroup
+  security_group_id = split("/", var.environment.outputs.ECSHostSecurityGroup)[1]
   description       = "Ingress from other containers in the same security group"
 }
 
