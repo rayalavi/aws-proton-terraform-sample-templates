@@ -4,22 +4,6 @@ data "aws_caller_identity" "current" {}
 
 data "aws_partition" "current" {}
 
-#data "aws_iam_policy_document" "function_bucket_policy_document" {
-#  statement {
-#    principals {
-#      type        = "AWS"
-#      identifiers = [for id in split(",", var.pipeline.inputs.environment_account_ids) : "arn:aws:iam::${id}:root"]
-#    }
-#    actions = [
-#      "s3:GetObject"
-#    ]
-#    resources = [
-#      aws_s3_bucket.function_bucket.arn,
-#      "${aws_s3_bucket.function_bucket.arn}/*"
-#    ]
-#  }
-#}
-
 data "aws_iam_policy_document" "publish_role_policy_document" {
   statement {
     effect = "Allow"
@@ -101,8 +85,8 @@ data "aws_iam_policy_document" "deployment_role_policy" {
   statement {
     effect = "Allow"
     resources = [
-      "arn:aws:logs:${local.region}:${local.account_id}:log-group:/aws/codebuild/Deploy*Project*",
-      "arn:aws:logs:${local.region}:${local.account_id}:log-group:/aws/codebuild/Deploy*Project:*",
+      "arn:aws:logs:${local.region}:${local.account_id}:log-group:/aws/codebuild/deploy-*",
+      "arn:aws:logs:${local.region}:${local.account_id}:log-group:/aws/codebuild/deploy-:*",
     ]
     actions = [
       "logs:CreateLogGroup",
@@ -113,7 +97,7 @@ data "aws_iam_policy_document" "deployment_role_policy" {
   statement {
     effect = "Allow"
     resources = [
-      "arn:aws:codebuild:${local.region}:${local.account_id}:report-group:/Deploy*Project-*",
+      "arn:aws:codebuild:${local.region}:${local.account_id}:report-group:/deploy--*",
     ]
     actions = [
       "codebuild:CreateReportGroup",
@@ -300,7 +284,7 @@ data "aws_iam_policy_document" "pipeline_build_codepipeline_action_role_policy" 
 data "aws_iam_policy_document" "pipeline_deploy_codepipeline_action_role_policy" {
   statement {
     effect    = "Allow"
-    resources = ["arn:aws:codebuild:${local.region}:${local.account_id}:project/Deploy*", ]
+    resources = ["arn:aws:codebuild:${local.region}:${local.account_id}:project/deploy-*", ]
     actions = [
       "codebuild:BatchGetBuilds",
       "codebuild:StartBuild",
