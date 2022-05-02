@@ -1,17 +1,9 @@
-#------------------------------------------------------------------------------
-# CLOUDWATCH EVENT RULE
-#------------------------------------------------------------------------------
 resource "aws_cloudwatch_event_rule" "event_rule" {
   name                = "ecs_task_event_rule"
   schedule_expression = "rate(5 minutes)"
   is_enabled          = true
   role_arn            = aws_iam_role.schedule_task_def_event_role.arn
 }
-
-#------------------------------------------------------------------------------
-# CLOUDWATCH EVENT TARGET 
-#------------------------------------------------------------------------------
-
 
 resource "aws_cloudwatch_event_target" "ecs_scheduled_task" {
   target_id = "Target0"
@@ -26,21 +18,16 @@ resource "aws_cloudwatch_event_target" "ecs_scheduled_task" {
 
     network_configuration {
       subnets = var.service_instance.inputs.subnet_type == "private" ? [
-        var.environment.outputs.PrivateSubnet1,
-        var.environment.outputs.PrivateSubnet2
+        var.environment.outputs.PrivateSubnetOneId,
+        var.environment.outputs.PrivateSubnetTwoId
         ] : [
-        var.environment.outputs.PublicSubnet1,
-        var.environment.outputs.PublicSubnet2
+        var.environment.outputs.PublicSubnetOneId,
+        var.environment.outputs.PublicSubnetTwoId
       ]
       assign_public_ip = var.service_instance.inputs.subnet_type == "private" ? false : true
     }
   }
 }
-
-
-#------------------------------------------------------------------------------
-# ECS - TASK DEF
-#------------------------------------------------------------------------------
 
 resource "aws_ecs_task_definition" "ecs_task_definition_local" {
   family = "${var.service.name}_${var.service_instance.name}"
@@ -77,18 +64,10 @@ resource "aws_ecs_task_definition" "ecs_task_definition_local" {
   requires_compatibilities = ["FARGATE"]
 }
 
-#------------------------------------------------------------------------------
-# CLOUDWATCH LOG GROUP
-#------------------------------------------------------------------------------
-
 resource "aws_cloudwatch_log_group" "ecs_task" {
   retention_in_days = 0
 }
 
-
-#------------------------------------------------------------------------------
-# SCHEDULED TASK DEF EVENT ROLE
-#------------------------------------------------------------------------------
 resource "aws_iam_role" "schedule_task_def_event_role" {
   name = "schedule_task_def_event_role"
 
@@ -108,10 +87,6 @@ resource "aws_iam_role" "schedule_task_def_event_role" {
     ]
   })
 }
-
-#------------------------------------------------------------------------------
-# SCHEDULED TASK DEF EVENT ROLE POLICY
-#------------------------------------------------------------------------------
 
 resource "aws_iam_role_policy" "schedule_task_def_event_role_policy" {
   role = aws_iam_role.schedule_task_def_event_role.id
@@ -147,10 +122,6 @@ resource "aws_iam_role_policy" "schedule_task_def_event_role_policy" {
   })
 }
 
-#------------------------------------------------------------------------------
-# SCHEDULED TASK DEF TASK ROLE
-#------------------------------------------------------------------------------
-
 resource "aws_iam_role" "schedule_task_def_task_role" {
 
   assume_role_policy = jsonencode({
@@ -167,11 +138,6 @@ resource "aws_iam_role" "schedule_task_def_task_role" {
     ]
   })
 }
-
-#------------------------------------------------------------------------------
-# SCHEDULED TASK DEF TASK ROLE POLICY
-#------------------------------------------------------------------------------
-
 
 resource "aws_iam_role_policy" "scheduled-task-def-task-role-policy" {
   policy = jsonencode({
