@@ -22,23 +22,23 @@ output "SnsRegion" {
   value = local.region
 }
 
-output "Vpc" {
+output "VpcId" {
   value = module.vpc.vpc_id
 }
 
-output "PublicSubnet1" {
+output "PublicSubnetOneId" {
   value = module.vpc.public_subnets[0]
 }
 
-output "PublicSubnet2" {
+output "PublicSubnetTwoId" {
   value = module.vpc.public_subnets[1]
 }
 
-output "PrivateSubnet1" {
+output "PrivateSubnetOneId" {
   value = module.vpc.private_subnets[0]
 }
 
-output "PrivateSubnet2" {
+output "PrivateSubnetTwoId" {
   value = module.vpc.private_subnets[1]
 }
 
