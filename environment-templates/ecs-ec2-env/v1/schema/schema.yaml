@@ -5,7 +5,7 @@ schema:
   types:
     EC2EnvironmentInput:
       type: object
-      description: "Input properties for my environment"
+      description: "Input properties for my EC2 environment"
       properties:
         vpc_cidr:
           type: string
