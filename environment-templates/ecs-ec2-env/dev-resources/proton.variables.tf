@@ -4,7 +4,7 @@ variable "environment" {
     name   = string
   })
   default = null
-}
+} 
 
 variable "service" {
   type = object({
