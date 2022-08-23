@@ -5,7 +5,7 @@ schema:
   types:
     PublicEnvironmentInput:
       type: object
-      description: "Input properties for my environment"
+      description: "Input properties for my environment vishnu"
       properties:
         vpc_cidr:
           type: string
